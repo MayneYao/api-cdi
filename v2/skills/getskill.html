@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .sk2{
+            padding: 10px;
+            background: url("Hover-Tooltip-Texture.png");
+            position: relative;
+            width: 400px;
+            display: block;
+        }
+        .name{
+            color: #ff8a2c;
+        }
+        .desc{
+            color: whitesmoke;
+        }
+        .facts{
+
+        }
+        .img{
+            width: 64px;
+            height: 64px;
+        }
+        .testdiv{
+            width: 100px;
+            height: 100px;
+            background-color: #00FF00;
+        }
+        .imgbuff{
+            width: 32px;
+            height: 32px;
+        }
+        .cd{
+            position: absolute;
+            right: 20px;
+            width: 16px;
+            height: 16px;
+        }
+    </style>
+    <script src="jquery-2.2.3.js"></script>
+</head>
+<body>
+<span class="skill" id="10219"></span><span class="skill" id="10333"></span><span class="skill" id="10218"></span><span class="skill" id="10221"></span><span class="skill" id="10220"></span>
+<script>
+    function getSkill() {
+        var skilldiv = document.getElementsByClassName("skill");
+        for (var i = 0; i < skilldiv.length; i++) {
+            var _skill = skilldiv[i];
+            var req = new XMLHttpRequest();
+            var id = _skill.id;
+            req.open("GET", "https://api.guildwars2.com/v2/skills/" + id, false);
+            req.send();
+            var skill = JSON.parse(req.responseText);
+            var img = document.createElement("img");
+            img.src = skill.icon;
+            img.className = "img";
+            img.id = "img" + id;
+            _skill.appendChild(img);
+        }
+    }
+    getSkill();
+    function createDiv(id){
+        var req = new XMLHttpRequest();
+        req.open("GET", "https://api.guildwars2.com/v2/skills/" + id, false);
+        req.send();
+        var skill = JSON.parse(req.responseText);
+        var skbox = document.createElement("p");
+        skbox.className="sk2";
+        skbox.id = "box"+id;
+        var name = document.createElement("div");
+        name.className="name";
+        name.innerHTML=skill.name;
+
+        var desc = document.createElement("div");
+        desc.className="desc";
+        desc.innerHTML=skill.description;
+
+        var facts = document.createElement("div");
+        facts.className="desc";
+
+        for (aaa in skill.facts)
+        {
+            var span = document.createElement("div");
+            span.className="facts";
+            var x = skill.facts[aaa];
+            var newimg=document.createElement("img");
+            newimg.className="imgbuff";
+            newimg.src=x["icon"];
+            span.appendChild(newimg);
+            for (ii in x){
+                if (ii=="icon"||ii=="type" ||ii=="percent")
+                {
+
+                }
+                else if (x[ii]=="Apply Buff/Condition"){
+
+                }
+                else if(x[ii]=="Recharge"){
+                    var cdimg=document.createElement("img");
+                    cdimg.src= x["icon"];
+                    cdimg.className="cd";
+                    skbox.appendChild(cdimg);
+                }
+                else {
+                    var p = document.createElement("span");
+                    p.innerHTML=x[ii]+"  ";
+                    span.appendChild(p);
+                }
+
+            }
+            facts.appendChild(span);
+        }
+
+        skbox.appendChild(name);
+        skbox.appendChild(desc);
+        skbox.appendChild(facts);
+        return skbox
+    }
+    function showskbox(e){
+        var id = e.split("img")[1];
+        var skbox  = createDiv(id);
+        document.getElementById(e).onmousemove=function(event){
+            x=event.pageX+10;
+            y=event.pageY+10;
+            skbox.style.position="absolute";
+            skbox.style.top = y+"px";
+            skbox.style.left = x+"px";
+            skbox.style.backgroundColor="#ccc";
+            document.body.appendChild(skbox);
+        };
+        document.getElementById(e).onmouseout= function (){
+            document.body.removeChild(skbox);
+        };
+    }
+
+    var img = document.getElementsByClassName("img");
+    for (var i=0;i<img.length;i++){
+        showskbox(img[i].id);
+    }
+
+</script>
+</body>
+</html>
